@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hitster Web (Spotify)</title>
+  <style>
+    body{margin:0;display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;background:#111;color:#fff;font-family:Arial, sans-serif;gap:18px;padding:18px;text-align:center}
+    button{font-size:3rem;padding:26px 54px;border:0;border-radius:16px;cursor:pointer}
+    .card{max-width:720px;width:100%;background:#1a1a1a;border-radius:16px;padding:14px 16px}
+    input, textarea{width:100%;border-radius:12px;border:1px solid #333;background:#0f0f0f;color:#fff;padding:10px;font-size:14px}
+    textarea{min-height:120px;resize:vertical}
+    .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+    .small{opacity:.75;font-size:13px;line-height:1.35}
+  </style>
+</head>
+<body>
+  <h1 style="margin:0;font-size:28px">🎶 Hitster Web (Spotify)</h1>
+
+  <button id="play">▶ PLAY</button>
+
+  <div class="card">
+    <div class="row">
+      <div style="flex:1;min-width:260px">
+        <label><b>1) Carica lista link (txt o csv)</b></label><br/>
+        <input id="file" type="file" accept=".txt,.csv" />
+        <div class="small" style="margin-top:6px">
+          Suggerimento: usa <b>spotify_links_300.txt</b> (un link per riga).<br/>
+          La pagina NON mostra titoli/artisti: apre solo Spotify.
+        </div>
+      </div>
+      <div style="flex:1;min-width:260px">
+        <label><b>2) Oppure incolla link qui</b> (uno per riga)</label><br/>
+        <textarea id="manual" placeholder="https://open.spotify.com/track/..."></textarea>
+      </div>
+    </div>
+    <div class="small" style="margin-top:10px">
+      Anti-spoiler: quando si apre Spotify, <b>gira il telefono</b> o copri lo schermo e premi Play.
+    </div>
+  </div>
+
+  <script>
+    let LINKS = [];
+
+    function parseTextToLinks(text) {
+      const lines = text.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+      // Se e' CSV con header, togli la prima riga se sembra un header
+      if (lines.length && lines[0].toLowerCase().includes("spotify")) {
+        return lines.slice(1).filter(Boolean);
+      }
+      return lines;
+    }
+
+    document.getElementById("file").addEventListener("change", async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const text = await file.text();
+      LINKS = parseTextToLinks(text);
+      alert("Caricati " + LINKS.length + " link.");
+    });
+
+    document.getElementById("play").addEventListener("click", () => {
+      const manualText = document.getElementById("manual").value.trim();
+      if (manualText) LINKS = parseTextToLinks(manualText);
+
+      if (!LINKS.length) {
+        alert("Carica o incolla prima una lista di link Spotify.");
+        return;
+      }
+      const i = Math.floor(Math.random() * LINKS.length);
+      window.location.href = LINKS[i];
+    });
+  </script>
+</body>
+</html>
